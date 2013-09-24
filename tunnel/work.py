@@ -43,19 +43,21 @@ def main():
 	# Ouverture d'un thread qui mangera les donnees du client
 	read_thread = threading.Thread(None, read_local_client_data, None, (s,), {})
 	write_thread = threading.Thread(None, write_local_client_data, None, (s,), {})
-	# Init connection HTTP
-	conn = httplib.HTTPConnection("192.168.12.94:8080")
-	headers = {"Content-Type": "application/octet-stream","Content-Transfer-Encoding": "base64", "Cache-Control": "no-store"}
 	while 1:
+		sleep(5)
+		# Init connection HTTP
+		conn = httplib.HTTPConnection("192.168.12.94:8080")
+		headers = {"Cache-Control": "no-store"}
 		# modif des data en fonction des event
 		try:
-			params = urllib.urlencode({'data': output_buffer.popleft()})
+			data = output_buffer.popleft()
 		except IndexError:
-			params = urllib.urlencode({'data': ''})
+			data = ''
 		# envoie de la request
 		try:
-			conn.request("POST", "", params, headers)
+			conn.request("GET", "/&data="+data, '', headers)
 		except socket.error:
+			conn.close()
 			sleep(5)
 			continue
 		# reception de la response
@@ -66,7 +68,7 @@ def main():
 		print data
 		# Post dans le buffer le retour du serveur
 		input_buffer.extend(data)
-	conn.close()
+		conn.close()
 	s.close()
 
 if __name__ == "__main__":

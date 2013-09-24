@@ -26,7 +26,7 @@ class HTTP_tunnel_handler(BaseHTTPServer.BaseHTTPRequestHandler):
       global input_buffer
       global output_buffer
       # Extrais les donnees de la requete
-      data = urlparse.parse_qs(urlparse.urlparse(self.path).query).get('data', None)
+      data = s.path[7:]
       input_buffer.extend(data)
       # Envoi de la reponse
       s.send_response(200)
