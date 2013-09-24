@@ -12,22 +12,22 @@ local_client_is_up = True
 
 def read_local_client_data(connection):
 	while 1:
-	# On recupere les donnees
-	data = connection.recv(1024)
-	if not data: break
+		# On recupere les donnees
+		data = connection.recv(1024)
+		if not data: break
 		output_buffer.extend(base64.b64encode(data))
-	local_client_is_up = False
+		local_client_is_up = False
 
 def write_local_client_data(connection):
 	while 1:
-	# On envoie des donnees si besoin
-	try:
-		connection.sendall(base64.b64decode(input_buffer.popleft()))
-	except IndexError:
-		sleep(0.1)
-	except Error:
-		local_client_is_up = False
-	if not local_client_is_up: break
+		# On envoie des donnees si besoin
+		try:
+			connection.sendall(base64.b64decode(input_buffer.popleft()))
+		except IndexError:
+			sleep(0.1)
+		except Error:
+			local_client_is_up = False
+		if not local_client_is_up: break
 
 
 def main():
