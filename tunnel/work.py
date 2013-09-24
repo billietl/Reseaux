@@ -12,7 +12,7 @@ local_client_is_up = True
 
 def read_local_client_data(connection):
 	while 1:
-	# On recupere les donnees
+	# On recupere les donnees
 	data = connection.recv(1024)
 	if not data: break
 		output_buffer.extend(base64.b64encode(data))
@@ -20,7 +20,7 @@ def read_local_client_data(connection):
 
 def write_local_client_data(connection):
 	while 1:
-	# On envoie des donnees si besoin
+	# On envoie des donnees si besoin
 	try:
 		connection.sendall(base64.b64decode(input_buffer.popleft()))
 	except IndexError:
