@@ -19,7 +19,7 @@ def communicate_with_local(connection):
 	global local_client_is_up
 	global output_buffer
 	global input_buffer
-	while 1:
+	while local_client_is_up:
 		read_me, write_me, err_dude = select.select([connection], [connection], [], 120)
 		for s in read_me:
 			data = s.recv(1024)
@@ -64,8 +64,19 @@ def main():
 				depuis_tunnel_data = r1.read()
 				# Post dans le buffer le retour du serveur
 				input_buffer.extend((depuis_tunnel_data,))
+			elif r1.status == 410:
+				r1.read()
+				local_client_is_up = False
+				comm_thread.join()
+				input_buffer.clear()
+				output_buffer.clear()
+				conn_local.close()
+				conn_local = socket.create_connection((HOST,PORT))
+				local_client_is_up = True
+				comm_thread = threading.Thread(None, communicate_with_local, None, (conn_local,), {})
+				comm_thread.start()
 			else :
-				output_buffer.extendleft((verse_tunnel_data,))
+				output_buffer.extendleft((vers_tunnel_data,))
 				sleep(5)
 			conn_tunnel.close()
 		except socket.error:
