@@ -15,14 +15,18 @@ input_buffer = deque()
 local_client_is_up = True
 
 def read_local_client_data(connection):
+	global local_client_is_up
+	global output_buffer
 	while 1:
 		# On recupere les donnees
 		data = connection.recv(1024)
 		if not data: break
 		output_buffer.extend(base64.b64encode(data))
-		local_client_is_up = False
+	local_client_is_up = False
 
 def write_local_client_data(connection):
+	global local_client_is_up
+	global input_buffer
 	while 1:
 		# On envoie des donnees si besoin
 		try:
@@ -35,11 +39,15 @@ def write_local_client_data(connection):
 
 
 def main():
+	global local_client_is_up
+	global input_buffer
+	global output_buffer
 	# Ouverture du socket sur un port aleatoire pour le client local
 	HOST = 'localhost'
 	PORT = int (input("Sur quel port souhaitez-vous vous connecter ?"))
-	s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-	s.connect((HOST, PORT))
+	s = socket.create_connection((HOST,PORT))
+	# On veut une socket non-bliquante
+	s.setblocking(0)
 	# Ouverture d'un thread qui mangera les donnees du client
 	read_thread = threading.Thread(None, read_local_client_data, None, (s,), {})
 	write_thread = threading.Thread(None, write_local_client_data, None, (s,), {})

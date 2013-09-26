@@ -64,12 +64,16 @@ def write_local_client_data(connection):
 
 def main():
    global local_client_is_up
+   global input_buffer
+   global output_buffer
    # Ouverture du socket sur un port aleatoire pour le client local
    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
    sock.bind(('',0))
    print "Connectez-vous sur le port ",sock.getsockname()[1]
    sock.listen(1)
    conn, addr = sock.accept()
+   # On veut une socket non-bloquante
+   conn.setblocking(0)
    # Ouverture d'un thread qui mangera les donnees du client
    read_thread = threading.Thread(None, read_local_client_data, None, (conn,), {})
    write_thread = threading.Thread(None, write_local_client_data, None, (conn,), {})
