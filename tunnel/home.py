@@ -30,7 +30,10 @@ class HTTP_tunnel_handler(BaseHTTPServer.BaseHTTPRequestHandler):
       data = s.path[7:]
       input_buffer.extend((data,))
       # Envoi de la reponse
-      s.send_response(200)
+      if local_client_is_up:
+         s.send_response(200)
+      else:
+         s.send_response(410)
       s.send_header("Content-Type", "application/octet-stream")
       s.send_header("Content-Transfer-Encoding", "base64")
       s.send_header("Cache-Control", "no-store")
@@ -81,6 +84,8 @@ def main():
    while local_client_is_up:
       tunnel_server.handle_request()
    # Fermeture du service
+   tunnel_server.handle_request()
+   comm_thread.join()
    local_conn.close()
    local_sock.close()
    print "Fermeture du tunnel"
