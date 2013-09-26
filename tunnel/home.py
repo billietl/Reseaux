@@ -28,7 +28,8 @@ class HTTP_tunnel_handler(BaseHTTPServer.BaseHTTPRequestHandler):
       global output_buffer
       # Extrais les donnees de la requete
       data = s.path[7:]
-      input_buffer.extend(data)
+      print "J'ai recu comme requete : \"" + data + "\""
+      input_buffer.extend((data,))
       # Envoi de la reponse
       s.send_response(200)
       s.send_header("Content-Type", "application/octet-stream")
@@ -47,10 +48,14 @@ def communicate_with_local(connection):
 	while 1:
            read_me, write_me, err_dude = select.select([connection], [connection], [], 120)
            for s in read_me:
-              output_buffer.extend(base64.b64encode(s.recv(1024)))
+              data = s.recv(1024)
+              data = base64.b64encode(data)
+              output_buffer.extend((data,))
            for s in write_me:
               try:
-                 s.sendall(base64.b64decode(input_buffer.popleft()))
+                 data = input_buffer.popleft()
+                 data = base64.b64decode(data[0])
+                 s.sendall(data)
               except IndexError:
                  pass
 

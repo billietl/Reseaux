@@ -22,10 +22,14 @@ def communicate_with_local(connection):
 	while 1:
 		read_me, write_me, err_dude = select.select([connection], [connection], [], 120)
 		for s in read_me:
-			output_buffer.extend(base64.b64encode(s.recv(1024)))
+			data = s.recv(1024)
+			data = base64.b64encode(data)
+			output_buffer.extend((data,))
                 for s in write_me:
 			try:
-				s.sendall(base64.b64decode(input_buffer.popleft()))
+				data = input_buffer.popleft()
+				data = base64.b64decode(data[0])
+				s.sendall(data)
 			except IndexError:
 				pass
 
@@ -36,7 +40,7 @@ def main():
 	global output_buffer
 	# Ouverture du socket sur un port aleatoire pour le client local
 	HOST = 'localhost'
-	PORT = int (input("Sur quel port souhaitez-vous vous connecter ?"))
+	PORT = int (input("Quel port voulez-vous rendre disponible ? "))
 	s = socket.create_connection((HOST,PORT))
 	# Ouverture d'un thread qui mangera les donnees du client
 	comm_thread = threading.Thread(None, communicate_with_local, None, (s,), {})
@@ -50,11 +54,13 @@ def main():
 		try:
 			data = output_buffer.popleft()
 		except IndexError:
-			data = ''
+			data = base64.b64decode('')
 		# envoie de la request
 		try:
+			print "j'envoie comme requete HTTP : \"" + data + "\""
 			conn.request("GET", "/&data="+data, '', headers)
 		except socket.error:
+			output_buffer.extendleft((data,))
 			conn.close()
 			sleep(5)
 			continue
