@@ -28,8 +28,6 @@ class HTTP_tunnel_handler(BaseHTTPServer.BaseHTTPRequestHandler):
       global output_buffer
       # Extrais les donnees de la requete
       data = s.path[7:]
-      print "J'ai recu comme requete : \"" + data + "\""
-      print "(ca veut dire " + base64.b64decode(data) + ")"
       input_buffer.extend((data,))
       # Envoi de la reponse
       s.send_response(200)

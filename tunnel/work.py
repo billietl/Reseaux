@@ -57,23 +57,22 @@ def main():
 			vers_tunnel_data = ''
 		# envoie de la request
 		try:
-			print "j'envoie comme requete HTTP : \"" + vers_tunnel_data + "\""
 			conn_tunnel.request("GET", "/&data="+vers_tunnel_data, '', headers)
+			# reception de la reponse
+			r1 = conn_tunnel.getresponse()
+			if r1.status == 200:
+				depuis_tunnel_data = r1.read()
+				# Post dans le buffer le retour du serveur
+				input_buffer.extend((depuis_tunnel_data,))
+			else :
+				output_buffer.extendleft((verse_tunnel_data,))
+				sleep(5)
+			conn_tunnel.close()
 		except socket.error:
 			output_buffer.extendleft((vers_tunnel_data,))
 			conn_tunnel.close()
 			sleep(5)
 			continue
-		# reception de la response
-		r1 = conn_tunnel.getresponse()
-		if r1.status == 200 :
-			depuis_tunnel_data = r1.read()
-			# Post dans le buffer le retour du serveur
-			input_buffer.extend(depuis_tunnel_data)
-		else :
-			output_buffer.extendleft((vers_tunnel_data,))
-			sleep(5)
-		conn_tunnel.close()
 	conn_local.close()
 
 if __name__ == "__main__":
