@@ -29,6 +29,7 @@ class HTTP_tunnel_handler(BaseHTTPServer.BaseHTTPRequestHandler):
       # Extrais les donnees de la requete
       data = s.path[7:]
       print "J'ai recu comme requete : \"" + data + "\""
+      print "(ca veut dire " + base64.b64decode(data) + ")"
       input_buffer.extend((data,))
       # Envoi de la reponse
       s.send_response(200)
@@ -54,7 +55,7 @@ def communicate_with_local(connection):
            for s in write_me:
               try:
                  data = input_buffer.popleft()
-                 data = base64.b64decode(data[0])
+                 data = base64.b64decode(data)
                  s.sendall(data)
               except IndexError:
                  pass
@@ -64,24 +65,24 @@ def main():
    global input_buffer
    global output_buffer
    # Ouverture du socket sur un port aleatoire pour le client local
-   sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-   sock.bind(('',0))
-   print "Connectez-vous sur le port ",sock.getsockname()[1]
-   sock.listen(1)
-   conn, addr = sock.accept()
+   local_sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+   local_sock.bind(('',0))
+   print "Connectez-vous sur le port ",local_sock.getsockname()[1]
+   local_sock.listen(1)
+   local_conn, addr = local_sock.accept()
    # Ouverture d'un thread qui mangera les donnees du client
-   comm_thread = threading.Thread(None, communicate_with_local, None, (conn,), {})
+   comm_thread = threading.Thread(None, communicate_with_local, None, (local_conn,), {})
    # Ouverture du serveur http
    server_address = ('',8080)
-   fresh_server = BaseHTTPServer.HTTPServer(server_address, HTTP_tunnel_handler)
+   tunnel_server = BaseHTTPServer.HTTPServer(server_address, HTTP_tunnel_handler)
    # Lancement du thread
    comm_thread.start()
    # Lancement du service
    while local_client_is_up:
-      fresh_server.handle_request()
+      tunnel_server.handle_request()
    # Fermeture du service
-   conn.close()
-   sock.close()
+   local_conn.close()
+   local_sock.close()
    print "Fermeture du tunnel"
    exit(0)
 
