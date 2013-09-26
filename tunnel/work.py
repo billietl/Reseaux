@@ -7,6 +7,7 @@ import socket
 import threading
 import httplib
 import urllib
+import select
 from collections import deque
 
 # Utiliser extend et popleft pour le buffer
@@ -14,28 +15,19 @@ output_buffer = deque()
 input_buffer = deque()
 local_client_is_up = True
 
-def read_local_client_data(connection):
+def communicate_with_local(connection):
 	global local_client_is_up
 	global output_buffer
-	while 1:
-		# On recupere les donnees
-		data = connection.recv(1024)
-		if not data: break
-		output_buffer.extend(base64.b64encode(data))
-	local_client_is_up = False
-
-def write_local_client_data(connection):
-	global local_client_is_up
 	global input_buffer
 	while 1:
-		# On envoie des donnees si besoin
-		try:
-			connection.sendall(base64.b64decode(input_buffer.popleft()))
-		except IndexError:
-			sleep(0.1)
-		except Error:
-			local_client_is_up = False
-		if not local_client_is_up: break
+		read_me, write_me, err_dude = select.select([connection], [connection], [], 120)
+		for s in read_me:
+			output_buffer.extend(base64.b64encode(s.recv(1024)))
+                for s in write_me:
+			try:
+				s.sendall(base64.b64decode(input_buffer.popleft()))
+			except IndexError:
+				pass
 
 
 def main():
@@ -46,11 +38,9 @@ def main():
 	HOST = 'localhost'
 	PORT = int (input("Sur quel port souhaitez-vous vous connecter ?"))
 	s = socket.create_connection((HOST,PORT))
-	# On veut une socket non-bliquante
-	s.setblocking(0)
 	# Ouverture d'un thread qui mangera les donnees du client
-	read_thread = threading.Thread(None, read_local_client_data, None, (s,), {})
-	write_thread = threading.Thread(None, write_local_client_data, None, (s,), {})
+	comm_thread = threading.Thread(None, communicate_with_local, None, (s,), {})
+	comm_thread.start()
 	while 1:
 		sleep(5)
 		# Init connection HTTP
