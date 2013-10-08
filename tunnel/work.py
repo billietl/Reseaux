@@ -10,6 +10,10 @@ import urllib
 import select
 from collections import deque
 
+# Modifiez ces variables en fonction de votre environnement
+__proxy__ = '192.168.12.94:3128'
+__l_autre_bout_du_tunnel__ = 'http://192.168.12.195'
+
 # Utiliser extend et popleft pour le buffer
 output_buffer = deque()
 input_buffer = deque()
@@ -38,6 +42,8 @@ def main():
 	global local_client_is_up
 	global input_buffer
 	global output_buffer
+	global __proxy__
+	global __l_autre_bout_du_tunnel__
 	# Ouverture du socket sur un port aleatoire pour le client local
 	HOST = 'localhost'
 	PORT = int (input("Quel port voulez-vous rendre disponible ? "))
@@ -48,7 +54,7 @@ def main():
 	while 1:
 		sleep(0.1)
 		# Init connection HTTP
-		conn_tunnel = httplib.HTTPConnection("192.168.12.94:80")
+		conn_tunnel = httplib.HTTPConnection(__proxy__)
 		headers = {"Cache-Control": "no-store"}
 		# modif des data en fonction des event
 		try:
@@ -57,7 +63,8 @@ def main():
 			vers_tunnel_data = ''
 		# envoie de la request
 		try:
-			conn_tunnel.request("GET", "/&data="+vers_tunnel_data, '', headers)
+			conn_tunnel.request("GET", __l_autre_bout_du_tunnel__+"/index.html?data="+vers_tunnel_data, '', headers)
+			print "j'essaye d'avoir " + __l_autre_bout_du_tunnel__+"/index.html?data="+vers_tunnel_data
 			# reception de la reponse
 			r1 = conn_tunnel.getresponse()
 			if r1.status == 200:
