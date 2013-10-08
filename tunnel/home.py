@@ -76,7 +76,7 @@ def main():
    # Ouverture d'un thread qui mangera les donnees du client
    comm_thread = threading.Thread(None, communicate_with_local, None, (local_conn,), {})
    # Ouverture du serveur http
-   server_address = ('',8080)
+   server_address = ('',80)
    tunnel_server = BaseHTTPServer.HTTPServer(server_address, HTTP_tunnel_handler)
    # Lancement du thread
    comm_thread.start()

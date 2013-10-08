@@ -48,7 +48,7 @@ def main():
 	while 1:
 		sleep(0.1)
 		# Init connection HTTP
-		conn_tunnel = httplib.HTTPConnection("192.168.12.94:8080")
+		conn_tunnel = httplib.HTTPConnection("192.168.12.94:80")
 		headers = {"Cache-Control": "no-store"}
 		# modif des data en fonction des event
 		try:
