@@ -6,6 +6,7 @@ import BaseHTTPServer
 def filter(request):
    ''' Retourne True si la requete est legit, false si c est un tunnel '''
    header = request.headers
+   print(type(header))
    print(header)
    return True
 
