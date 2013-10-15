@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import sys, select, urlparse, re
+import sys, select, urlparse, re, httplib
 import BaseHTTPServer
 
 def filter(request):
