@@ -27,7 +27,7 @@ class HTTP_tunnel_handler(BaseHTTPServer.BaseHTTPRequestHandler):
       global input_buffer
       global output_buffer
       # Extrais les donnees de la requete
-      data = s.path[17:]
+      data = s.path[s.path.index('=')+1:]
       input_buffer.extend((data,))
       # Envoi de la reponse
       if local_client_is_up:

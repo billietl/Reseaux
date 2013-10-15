@@ -7,12 +7,13 @@ import socket
 import threading
 import httplib
 import urllib
+import sys
 import select
 from collections import deque
 
-# Modifiez ces variables en fonction de votre environnement
-__proxy__ = '192.168.12.94:3128'
-__l_autre_bout_du_tunnel__ = 'http://192.168.12.195'
+def usage():
+    print "work.py <site de destination> <proxy>"
+    exit(1)
 
 # Utiliser extend et popleft pour le buffer
 output_buffer = deque()
@@ -63,8 +64,7 @@ def main():
 			vers_tunnel_data = ''
 		# envoie de la request
 		try:
-			conn_tunnel.request("GET", __l_autre_bout_du_tunnel__+"/index.html?data="+vers_tunnel_data, '', headers)
-			print "j'essaye d'avoir " + __l_autre_bout_du_tunnel__+"/index.html?data="+vers_tunnel_data
+			conn_tunnel.request("GET", "http://"+__l_autre_bout_du_tunnel__+"/index.html?data="+vers_tunnel_data, '', headers)
 			# reception de la reponse
 			r1 = conn_tunnel.getresponse()
 			if r1.status == 200:
@@ -94,4 +94,10 @@ def main():
 	conn_local.close()
 
 if __name__ == "__main__":
+    if len(sys.argv)<3:
+	    usage()
+    global __proxy__
+    __proxy__ = sys.argv[2]
+    global __l_autre_bout_du_tunnel__
+    __l_autre_bout_du_tunnel__ = sys.argv[1]
     main()
