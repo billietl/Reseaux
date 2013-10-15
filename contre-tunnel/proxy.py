@@ -1,14 +1,14 @@
 #!/usr/bin/env python
 
-import sys, select, urlparse, re, httplib
+import sys, select, urlparse, re, httplib, string
 import BaseHTTPServer
 
 def filter(request):
    ''' Retourne True si la requete est legit, false si c est un tunnel '''
-   header = request.headers
-   print(type(header))
-   print(header)
-   return True
+   requestok = True
+   header = str(request.headers).upper()
+   if 'USER-AGENT' not in header: requestok = False
+   return requestok
 
 class httpRequest(BaseHTTPServer.BaseHTTPRequestHandler):
    def do_GET(s):
