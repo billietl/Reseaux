@@ -66,7 +66,7 @@ def main():
     serveraddress = ('', __port__)
     proxyserver = BaseHTTPServer.HTTPServer(serveraddress, httpRequest)
     while True:
-	proxyserver.handle_request()
+		proxyserver.handle_request()
 	return 0
 
 if __name__ == '__main__':
