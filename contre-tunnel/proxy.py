@@ -19,15 +19,24 @@ class httpRequest(BaseHTTPServer.BaseHTTPRequestHandler):
       httpRequest.do_something(s)
    def do_something(s):
       if filter(s):
+         print "decodage de la requete entrante"
          command = s.command
          path = s.path
          url = urlparse.urlparse(s.path).netloc
          version = s.request_version
          headers = s.headers
-         data = s.rfile.read()
+         print "lecture du flux de donnees"
+         if command=="POST":
+            data = s.rfile.read()
+         else:
+            data = ''
+         print "decode"
          # proxyfication de la requete
+         print "envoi de la requete proxifiee"
          http_con = httplib.HTTPConnection(url)
          http_con.request(command, path, data, headers)
+         print "envoye"
+         print "recuperation de la reponse"
          http_rep = http_con.get_response()
          response_headers = http_rep.getheaders()
          response_status = http_rep.status
@@ -36,12 +45,15 @@ class httpRequest(BaseHTTPServer.BaseHTTPRequestHandler):
          else:
             response_data = ''
          http_con.close()
+         print "recupere"
          # envoi de la reponse proxyfiee
+         print "renvoi de la reponse"
          s.send_response(response_status)
          for h in response_headers:
             s.send_header(h[0], h[1])
          s.end_headers()
          s.wfile.write(response_data)
+         print "renvoye"
       else:
          s.send_error(403, 'YOU SHALL NOT PASS !!!')
          
