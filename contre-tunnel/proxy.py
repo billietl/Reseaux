@@ -58,6 +58,7 @@ if __name__ == '__main__':
         usage()
     if not sys.argv[1].isdigit():
         usage()
-    global __port__ = int(sys.argv[1])
+    global __port__
+    __port__ = int(sys.argv[1])
     main()
 
