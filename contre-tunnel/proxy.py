@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 
-import sys, select, urlparse
+import sys, select, urlparse, re
 
 def filter(request):
    ''' Retourne True si la requete est legit, false si c est un tunnel '''
+   header = s.headers
+   print(header)
    return True
 
 class httpRequest(BaseHTTPServer.BaseHTTPRequestHandler):
