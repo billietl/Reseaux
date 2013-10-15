@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import sys, select, urlparse, re
+import BaseHTTPServer
 
 def filter(request):
    ''' Retourne True si la requete est legit, false si c est un tunnel '''
