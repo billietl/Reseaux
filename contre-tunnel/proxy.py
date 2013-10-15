@@ -8,7 +8,7 @@ def filter(request):
    requestok = True
    header = str(request.headers).upper()
    if 'USER-AGENT' not in header: requestok = False
-   return requestok
+   return True#requestok
 
 class httpRequest(BaseHTTPServer.BaseHTTPRequestHandler):
    def do_GET(s):
@@ -23,8 +23,11 @@ class httpRequest(BaseHTTPServer.BaseHTTPRequestHandler):
          command = s.command
          path = s.path
          url = urlparse.urlparse(s.path).netloc
-         version = s.request_version
-         headers = s.headers
+         headers_tmp = str(s.headers).split("\n")
+         print headers_tmp
+         headers = dict()
+         for h in headers_tmp:
+            if not h == '': headers[h.split(" ", 1)[0]] = h.split(" ", 1)[1].strip()
          print "lecture du flux de donnees"
          if command=="POST":
             data = s.rfile.read()
@@ -33,29 +36,37 @@ class httpRequest(BaseHTTPServer.BaseHTTPRequestHandler):
          print "decode"
          # proxyfication de la requete
          print "envoi de la requete proxifiee"
-         http_con = httplib.HTTPConnection(url)
-         http_con.request(command, path, data, headers)
-         print "envoye"
-         print "recuperation de la reponse"
-         http_rep = http_con.get_response()
-         response_headers = http_rep.getheaders()
-         response_status = http_rep.status
-         if response_status <= 299 and http_rep.status >=200:
-            response_data = http_rep.read()   
-         else:
-            response_data = ''
-         http_con.close()
-         print "recupere"
+         try:
+            http_con = httplib.HTTPConnection(url)
+            print headers
+            http_con.request(command, path, data, headers)
+            print "envoye"
+            print "recuperation de la reponse"
+            http_rep = http_con.get_response()
+            print "recupere"
+            response_headers = http_rep.getheaders()
+            response_status = http_rep.status
+            print str(response_status)
+            if response_status <= 299 and http_rep.status >=200:
+               response_data = http_rep.read()   
+            else:
+               response_data = ''
+            http_con.close()
+            print "done"
          # envoi de la reponse proxyfiee
-         print "renvoi de la reponse"
-         s.send_response(response_status)
-         for h in response_headers:
-            s.send_header(h[0], h[1])
-         s.end_headers()
-         s.wfile.write(response_data)
-         print "renvoye"
+            print "renvoi de la reponse"
+            s.send_response(response_status)
+            for h in response_headers:
+               s.send_header(h[0], h[1])
+            s.end_headers()
+            s.wfile.write(response_data)
+            print "renvoye"
+         except Exception:
+            s.send_response(502, 'No route to host, dumbass !')
+            s.end_headers()
+            s.wfile.write('')
       else:
-         s.send_error(403, 'YOU SHALL NOT PASS !!!')
+         s.send_error(403, 'How about no ?')
          
 
 def usage():
@@ -67,7 +78,7 @@ def main():
     proxyserver = BaseHTTPServer.HTTPServer(serveraddress, httpRequest)
     while True:
 	proxyserver.handle_request()
-	return 0
+    return 0
 
 if __name__ == '__main__':
     if len(sys.argv)<2:
