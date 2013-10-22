@@ -1,8 +1,7 @@
-Partie 1 : Prise en main
+Atelier 1 : Prise en main
 Q1- B4 91 45 AA 90 00
 
 Q2- 
-
 B4 91 45 AA CA 88 04 00 47 C1 1E 59 B9 00 50 05
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
@@ -24,7 +23,7 @@ Q7-
 35 FE 00 00
 
 
-Partie 2 : Pairage bluetooth
+Atelier 2 : Pairage bluetooth
 
 Initialisation de l'ultralight C :
 E1 10 12 00
