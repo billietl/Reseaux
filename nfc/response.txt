@@ -26,8 +26,22 @@ Q7-
 
 Partie 2 : Pairage bluetooth
 
-message NDEF :
+Initialisation de l'ultralight C :
 E1 10 12 00
 01 03 A0 10
-44 03 00 NDEF
-FE
+44 03 3B D2
+20 18 61 70
+70 6C 69 63
+61 74 69 6F
+6E 2F 76 6E
+64 2E 62 6C
+75 65 74 6F
+6F 74 68 2E
+65 70 2E 6F
+6F 62 00 16
+C7 08 47 FD
+0D 00 0F 09
+4E 6F 6B 69
+61 20 50 6C
+61 79 20 33
+36 30 FE 00
