@@ -58,6 +58,8 @@ Date de naissance : dans le fichier environnement, a partir du 71ème bit codé en
 journal des évènements : 00 B2 01 44 00
 		    ...  00 B2 03 44 00
 date de l'évènement : 14 premiers bits : nombre de jours depuis le 1er janvier 1997
+		      11 bits suivants : nombre de minutes depuis minuit
+		      69ème bit, 16 bits : code station
 
 sujet de doc : SNEP (simple ndef exchange protocol)
 ebenfattoum@citc-eurarfid.com
