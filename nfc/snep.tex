@@ -31,16 +31,21 @@
 \date{23 Oct. 2013}
 \maketitle
 
+Ceci est une mauvaise r\'ef\'erence \cite{Wikipedia_NFC}.
+
 \section{Introduction}
 
-Le Simple NDEF Exchange Protocol (SNEP) permet \`a une application s'executant sur un appareil \'equip\'e pour le NFC d'\'echanger des messages NDEF (NFC Data Exchange Format) avec un autre appareil \'equip\'e lors d'une communication en mode pair \`a pair. Le protocole se base sur le protocole Logical Link Control Protocol (LLCP) afin d'\'etablir une liaison fiable lors de l'\'echange de donn\'ees.\cite{NFC_forum}
+Le Simple NDEF Exchange Protocol (SNEP) permet \`a une application s'executant sur un appareil \'equip\'e pour le NFC
+d'\'echanger des messages NDEF (NFC Data Exchange Format) avec un autre appareil \'equip\'e lors d'une communication en mode pair \`a pair.
+Le protocole se base sur le protocole Logical Link Control Protocol (LLCP) afin d'\'etablir une liaison fiable lors de l'\'echange de donn\'ees.\cite{NFC_forum} Sa sp\'ecification est g\'er\'ee par lr NFC Forum.
 
+\section{Forme des messages}
 
-Ceci est une mauvaise r\'ef\'erence \cite{Wikipedia_NFC}.
-\section{Un autre chapitre}
+Le protocole consiste en un \'echange de requ\^ete / r\'eponse.
+La requ\^ete est compos\'ee de la version du protocole (1 octet), la m\'ethode de la requ\^ete (continue, get, put ou reject, soit 1 octet), la taille du message (4 octets) et le message.
+La r\'eponse est compos\'ee de la version du protocole (1 octet), un code d'\'etat indiquant le succes ou l'\'echec de l'op\'eration (1 octet), la taille du message (4 octets) et le message.
 
 \section{Bibliographie}
-
 % Bibliographie
 \bibliographystyle{unsrt}
 \bibliography{biblio}{}
