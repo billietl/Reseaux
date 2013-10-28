@@ -33,14 +33,85 @@
 
 \section{Introduction}
 
-Le Simple NDEF Exchange Protocol (SNEP) permet \`a une application s'executant sur un appareil \'equip\'e pour le NFC d'\'echanger des messages NDEF (NFC Data Exchange Format) avec un autre appareil \'equip\'e lors d'une communication en mode pair \`a pair. Le protocole se base sur le protocole Logical Link Control Protocol (LLCP) afin d'\'etablir une liaison fiable lors de l'\'echange de donn\'ees.\cite{NFC_forum}
+Le Simple NDEF Exchange Protocol (SNEP) permet \`a une application s'executant sur un appareil \'equip\'e pour le NFC
+d'\'echanger des messages NDEF (NFC Data Exchange Format) avec un autre appareil \'equip\'e lors d'une communication en mode pair \`a pair.
+Le protocole se base souvent sur le protocole Logical Link Control Protocol (LLCP) afin d'\'etablir une liaison fiable lors de l'\'echange de donn\'ees.\cite{NFC_forum}
+Sa sp\'ecification est g\'er\'ee par le NFC Forum.\cite{NDEF_spec}
+
+\section{Un protocole bas\'e sur l'\'echange de messages}
+
+Le protocole consiste en un \'echange de requ\^ete / r\'eponse.
+\'Echanger de tels messages necessite un protocole de transport fiable capable de transmettre des messages d'au moins 6 octets.
+La communication entre plusieurs clients/serveurs n\'ecessite un protocole de transport supportant des connection simultan\'ees logiquement s\'epar\'es.
+Dans l'architecture d\'efinie par le NFC Forum, SNEP repose sur le protocole LLCP.
+
+\section{La forme des messages}
+
+La requ\^ete est compos\'ee de la version du protocole (1 octet), la m\'ethode de la requ\^ete (continue, get, put ou reject, soit 1 octet), la taille du message (4 octets) et les informations concernant la requ\^ete (taille maximum : 2\up{32}-1 octets).
 
 
-Ceci est une mauvaise r\'ef\'erence \cite{Wikipedia_NFC}.
-\section{Un autre chapitre}
+
+La r\'eponse est compos\'ee de la version du protocole (1 octet), un code d'\'etat indiquant le succes ou l'\'echec de l'op\'eration (1 octet), la taille du message (4 octets) et les informations concernant la r\'eponse (taille maximum : 2\up{32}-1 octets).
+
+
+
+Les messages SNEP peuvent \^etre fragment\'es pour pouvoir transporter des messages NDEF de taille sup\'erieure \`a 2\up{32}-1 octets.
+Le premier fragment devras alors comporter l'ent\^ete complète du message SNEP (soit la version du protocole, la m\'ethode o\`u le code d'\'etat et la taille du message).
+
+\section{La fragmentation des messages}
+
+Lors de l'envoi d'un premier fragment de message, le destinataire doit indiquer \`a l'\'emetteur qu'il est capable de recevoir les fragments suivants. Dans ce cas, l'\'emetteur transmet le reste des fragments sans attendre d'acquittement.
+
+
+M\^eme dans le cas o\`u le destinataire d'un message SNEP ne supporte pas la version du protocole utili\'e, il doit \^etre en mesure de savoir si un message est un premier fragement ou un message complet.
+
+
+Si une requ\^ete est compl\`ete, le destinataire ne doit pas acquitter mais r\'epondre tout de suite \`a la requ\^ete.
+
+\section{Les m\'ethode de requ\^ete}
+La m\'ethode appell\'ee est cod\'e sur 1 octet comme suit :\\
+\begin{tabular}{| l | l | l |}
+\hline
+Code & Nom & Description \\
+\hline
+00 & Continue & Demande d'envoi des fragments suivants. \\
+01 & Get & Demande d'informations. \\
+02 & Put & Soumission d'informations. \\
+03-7E & & R\'eserv\'e pour usage futur. \\
+7F & Reject & Ne pas envoyer les fragments suivants. \\
+80-F & & Reserv\'e pour les codes de r\'eponse. \\\hline
+\end{tabular}
+
+\subsection{Compl\'ement d'informations : GET}
+Le dernier champ d'une requ\^ete GET est d\'ecoup\'e en deux partie : la taille accept\'ee (cod\'e sur 4 octets) et le message NDEF, d\'esignant la ressource consult\'ee.
+
+
+\section{Les codes de r\'eponse}
+Le code de r\'eponse est cond\'e sur 1 octet comme suit :\\
+\begin{tabular}{| l | l | l |}
+\hline
+Code & Nom & Description \\
+\hline
+00-7F & & R\'eserv\'e pour les m\'ethodes de requ\^ete \\
+80 & Continue & Envoyez les fragments suivants. \\
+81 & Succes & L'op\'eration accomplie. \\
+82-BF & & R\'eserv\'e pour usage futur. \\
+C0 & Not Found & Le ressource n'existe pas. \\
+C1 & Excess Data & Trop de donn\'ees. \\
+C2 & Bad Request & Requ\^ete non comprise. \\
+C3-DF & & R\'eserv\'e pour usage futur. \\
+E0 & Not Implemented & La requ\^ete n'est pas support\'ee. \\
+E1 & Unsupported Version & Le protocol n'est pas support\'e. \\
+E2-FE & & R\'eserv\'e pour usage futur. \\
+FF & Reject & N'envoyez pas les fragments suivants. \\
+\hline
+\end{tabular}
+
+\subsection{Compl\'ement d'information : Success}
+Le dernier champ ne doit \^etre renseign\'e que si la m\'ethode \'etait un GET.
+
 
 \section{Bibliographie}
-
 % Bibliographie
 \bibliographystyle{unsrt}
 \bibliography{biblio}{}
