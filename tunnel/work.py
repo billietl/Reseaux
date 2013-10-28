@@ -56,7 +56,7 @@ def main():
 		sleep(0.1)
 		# Init connection HTTP
 		conn_tunnel = httplib.HTTPConnection(__proxy__)
-		headers = {"Cache-Control": "no-store"}
+		headers = {"Cache-Control": "no-store", "User-Agent": "Overclocked minitel over avian carrier"}
 		# modif des data en fonction des event
 		try:
 			vers_tunnel_data = output_buffer.popleft()
