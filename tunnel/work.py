@@ -25,6 +25,7 @@ def communicate_with_local(connection):
 	global output_buffer
 	global input_buffer
 	while local_client_is_up:
+                sleep(1)
 		read_me, write_me, err_dude = select.select([connection], [connection], [], 120)
 		for s in read_me:
 			data = s.recv(1024)
@@ -56,7 +57,12 @@ def main():
 		sleep(0.1)
 		# Init connection HTTP
 		conn_tunnel = httplib.HTTPConnection(__proxy__)
-		headers = {"Cache-Control": "no-store", "User-Agent": "Overclocked minitel over avian carrier"}
+		headers = {
+                    "Cache-Control": "no-store",
+                    "User-Agent": "Overclocked minitel over avian carrier",
+                    "Content-Length": "0",
+                    "Accept-Encoding": "base64"
+                }
 		# modif des data en fonction des event
 		try:
 			vers_tunnel_data = output_buffer.popleft()
@@ -66,7 +72,7 @@ def main():
 		try:
 			conn_tunnel.request("GET", "http://"+__l_autre_bout_du_tunnel__+"/index.html?data="+vers_tunnel_data, '', headers)
 			# reception de la reponse
-			r1 = conn_tunnel.getresponse()
+                        r1 = conn_tunnel.getresponse()
 			if r1.status == 200:
 				depuis_tunnel_data = r1.read()
 				# Post dans le buffer le retour du serveur
@@ -86,7 +92,7 @@ def main():
 				output_buffer.extendleft((vers_tunnel_data,))
 				sleep(5)
 			conn_tunnel.close()
-		except socket.error:
+		except (socket.error, httplib.BadStatusLine):
 			output_buffer.extendleft((vers_tunnel_data,))
 			conn_tunnel.close()
 			sleep(5)

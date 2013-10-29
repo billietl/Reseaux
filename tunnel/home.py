@@ -35,7 +35,7 @@ class HTTP_tunnel_handler(BaseHTTPServer.BaseHTTPRequestHandler):
       else:
          s.send_response(410)
       s.send_header("Content-Type", "application/octet-stream")
-      s.send_header("Content-Transfer-Encoding", "base64")
+      s.send_header("Content-Encoding", "base64")
       s.send_header("Cache-Control", "no-store")
       s.end_headers()
       try:
@@ -48,6 +48,7 @@ def communicate_with_local(connection):
 	global output_buffer
 	global input_buffer
 	while local_client_is_up:
+           sleep(1)
            read_me, write_me, err_dude = select.select([connection], [connection], [], 120)
            for s in read_me:
               data = s.recv(1024)
