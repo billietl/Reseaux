@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import re, httplib
+import re, httplib, base64
 import cherryproxy
 
 class Proxy(cherryproxy.CherryProxy):
@@ -28,7 +28,6 @@ class Proxy(cherryproxy.CherryProxy):
          accepted = False
       if not accepted:
          self.denie()
-      pass
 
    def filter_response(self):
       headers = dict(self.resp.headers)
