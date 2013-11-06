@@ -48,10 +48,10 @@ def communicate_with_local(connection):
 	global output_buffer
 	global input_buffer
 	while local_client_is_up:
-#           sleep(1)
+           sleep(0.1)
            read_me, write_me, err_dude = select.select([connection], [connection], [], 120)
            for s in read_me:
-              data = s.recv(1024)
+              data = s.recv(512)
               if len(data)==0:
                  local_client_is_up = False
               data = base64.b64encode(data)

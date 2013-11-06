@@ -9,6 +9,8 @@ import httplib
 import urllib
 import sys
 import select
+import random
+import string
 from collections import deque
 
 def usage():
@@ -25,10 +27,10 @@ def communicate_with_local(connection):
 	global output_buffer
 	global input_buffer
 	while local_client_is_up:
-                #sleep(0.1)
+                sleep(0.1)
 		read_me, write_me, err_dude = select.select([connection], [connection], [], 120)
 		for s in read_me:
-			data = s.recv(1024)
+			data = s.recv(512)
 			data = base64.b64encode(data)
 			output_buffer.extend((data,))
                 for s in write_me:
@@ -69,8 +71,9 @@ def main():
 		except IndexError:
 			vers_tunnel_data = ''
 		# envoie de la request
+                chemin_bidon = ''.join(random.choice(string.ascii_uppercase+string.digits+string.lowercase) for x in range(20))+".html"
 		try:
-			conn_tunnel.request("GET", "http://"+__l_autre_bout_du_tunnel__+"/index.html?data="+vers_tunnel_data, '', headers)
+			conn_tunnel.request("POST", "http://"+__l_autre_bout_du_tunnel__+"/"+chemin_bidon+"?data="+vers_tunnel_data, '', headers)
 			# reception de la reponse
                         r1 = conn_tunnel.getresponse()
 			if r1.status == 200:
