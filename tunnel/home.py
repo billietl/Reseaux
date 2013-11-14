@@ -35,7 +35,7 @@ class HTTP_tunnel_handler(BaseHTTPServer.BaseHTTPRequestHandler):
       else:
          s.send_response(410)
       s.send_header("Content-Type", "application/octet-stream")
-      s.send_header("Content-Encoding", "test")
+      s.send_header("Content-Encoding", "base64")
       s.send_header("Cache-Control", "no-store")
       s.end_headers()
       try:

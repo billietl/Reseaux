@@ -1,0 +1,65 @@
+Atelier 1 : Prise en main
+Q1- L'identifiant de la carte :
+B4 91 45 AA 90 00
+
+Q2- Les données contenues dans les 4 premiers secteurs
+B4 91 45 AA CA 88 04 00 47 C1 1E 59 B9 00 50 05
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 FF 07 80 69 FF FF FF FF FF FF
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 FF 07 80 69 FF FF FF FF FF FF
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+00 00 00 00 00 00 FF 07 80 69 FF FF FF FF FF FF
+
+Q3- Analyse des données
+Le premier secteur contiens des données. Surement un header par défaut.
+Tous les 4 secteurs, nous avons les trailer blocks. Ils permettent de controller l'acces aux données.
+
+Q7-
+03 0F D1 01
+0B 55 05 30
+38 33 36 36
+35 36 35 36
+35 FE 00 00
+
+
+Atelier 2 : Pairage bluetooth
+
+Initialisation de l'ultralight C :
+E1 10 12 00
+01 03 A0 10
+44 03 3B D2
+20 18 61 70
+70 6C 69 63
+61 74 69 6F
+6E 2F 76 6E
+64 2E 62 6C
+75 65 74 6F
+6F 74 68 2E
+65 70 2E 6F
+6F 62 00 16
+C7 08 47 FD
+0D 00 0F 09
+4E 6F 6B 69
+61 20 50 6C
+61 79 20 33
+36 30 FE 00
+
+Atelier 3 : lecture de la carte PassPass de transpole
+Commande de selection de l'application : 00 A4 04 00 08 33 4D 54 52 2E 49 43 41
+Commande de lecture d'un enregistrement : 00 B2 nn (SFI*8)+4 00
+identité du porteur : 00 B2 01 3C 00
+Date de naissance : dans le fichier environnement, a partir du 71ème bit codé en BCD : aaaammjj
+journal des évènements : 00 B2 01 44 00
+		    ...  00 B2 03 44 00
+date de l'évènement : 14 premiers bits : nombre de jours depuis le 1er janvier 1997
+		      11 bits suivants : nombre de minutes depuis minuit
+		      69ème bit, 16 bits : code station
+
+sujet de doc : SNEP (simple ndef exchange protocol)
+ebenfattoum@citc-eurarfid.com

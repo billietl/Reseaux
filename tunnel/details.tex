@@ -1,0 +1,70 @@
+\documentclass[oneside,10pt]{article}
+\usepackage[latin1]{inputenc}
+\usepackage[francais]{babel}
+\usepackage[francais]{layout}
+\usepackage[OT1]{fontenc}
+\usepackage{listings}
+\usepackage{cite}
+\usepackage{textcomp}
+
+% RÃƒÂ©glages du document
+\lstset{language=bash, frame=single, breaklines=true, basicstyle=\ttfamily, keywordstyle=\bfseries}
+\setlength{\hoffset}{-18pt}        
+\setlength{\oddsidemargin}{0pt} % Marge gauche sur pages impaires
+\setlength{\evensidemargin}{9pt} % Marge gauche sur pages paires
+\setlength{\marginparwidth}{54pt} % Largeur de note dans la marge
+\setlength{\textwidth}{481pt} % Largeur de la zone de texte (17cm)
+\setlength{\voffset}{-18pt} % Bon pour DOS
+\setlength{\marginparsep}{7pt} % SÃ©paration de la marge
+\setlength{\topmargin}{0pt} % Pas de marge en haut
+\setlength{\headheight}{13pt} % Haut de page
+\setlength{\headsep}{10pt} % Entre le haut de page et le texte
+\setlength{\footskip}{27pt} % Bas de page + sÃ©paration
+\setlength{\textheight}{708pt} % Hauteur de la zone de texte (25cm)
+
+\begin{document}
+
+% Page de couverture
+\title{Proposition de solution : tunnel HTTP}
+\author{Louis BILLIET \\ Florent DAVID}
+\date{12 Nov. 2013}
+\maketitle
+
+\section{Mode de fonctionnemnt}
+\subsection{Le script derri\`ere le proxy : work.py}
+Le script demande \`a l'utilisateur quel service (port) rendre disponible depuis l'autre bout du tunnel.
+Il cr\'eera ensuite un thread afin d'assurer la communication entre le service rendu disponible et le script \verb+home.py+.
+Ce thread utilisera deux buffers afin de temporiser la discution avec le service.
+Le thread principal communiquera ensuite avec le script \verb+home.py+ en HTTP via des requ\^etes POST, en utilisant les mêmes buffers que le second thread pour faire transiter les données.
+Losqu'on reçoit un code de r\'eponse 410, on vide les buffers et on renouvelle la connection avec le service local, pour émuler la connection d'un nouveau client.
+
+\subsection{Le script sur l'internet : home.py}
+Le script ouvre une socket afin d'accueillir la connection du client qui va traverser le tunnel, et en communiquera le port \`a l'utilisateur.
+Un thread sera cr\'e\'e comme dans le script \verb+work.py+ pour assurer la communication avec le client local.
+Le thread principal lancera un serveur HTTP customis\'e qui receptionnera les requ\^etes du script \verb+work.py+.
+Lorsque le client ferme la connection, le serveur HTTP envoie un code de réponse 410 et ferme toute connection pour terminer.
+
+\section{Les stat\'egies de d\'etection contourn\'es}
+\subsection{Contournement de la politique de cache}
+Dans chaque requ\^ete, le header ``Cache-Control'' pr\'ecise au serveur de ne pas cacher la réponse.
+De m\^eme pour les r\'eponses.
+Ainsi, un proxy normalement configur\'e respectant les normes sera oblig\'e de faire suivres toutes les requ\^etes vers le serveur.
+
+\subsection{Pr\'ecision du type de donn\'e envoy\'es}
+Les requ\^etes précisent que \verb+work.py+ acc\`epte l'encodage en base64 uniquement.
+Encodage qu'utilise \verb+home.py+ pour transf\'erer les donn\'ees.
+
+\subsection{Vous avez dit ``port exotique'' ?}
+Le serveur web du script \verb+home.py+ \'ecoute sur le port 80.
+Les proxy restreignant les ports accessibles ne peuvent bloquer le port 80.
+A moins de bloquer 90\% du trafic de l'internet.
+
+\subsection{Trop de requ\^ete vers la m\^eme ressource ?}
+Chaque requ\^ete concerne un fichier html dont le nom fait 20 caract\`eres de long.
+Il y a donc peu de chances de consulter 2 fois la m\^eme ressource en 1 seconde.
+
+\subsection{La requ\^ete de taille tr\`es correcte}
+Le corps de la requ\^ete fait 0 octet, \'etant donn\'e qu'elle est vide.
+La taille annonc\'e est donc de 0, pour les proxies un peu trop curieux.
+
+\end{document}
