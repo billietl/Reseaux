@@ -1,0 +1,69 @@
+\documentclass[oneside,10pt]{article}
+\usepackage[latin1]{inputenc}
+\usepackage[francais]{babel}
+\usepackage[francais]{layout}
+\usepackage[OT1]{fontenc}
+\usepackage{listings}
+\usepackage{cite}
+\usepackage{textcomp}
+\usepackage{hyperref}
+
+% RÃƒÂ©glages du document
+\lstset{language=bash, frame=single, breaklines=true, basicstyle=\ttfamily, keywordstyle=\bfseries}
+\setlength{\hoffset}{-18pt}        
+\setlength{\oddsidemargin}{0pt} % Marge gauche sur pages impaires
+\setlength{\evensidemargin}{9pt} % Marge gauche sur pages paires
+\setlength{\marginparwidth}{54pt} % Largeur de note dans la marge
+\setlength{\textwidth}{481pt} % Largeur de la zone de texte (17cm)
+\setlength{\voffset}{-18pt} % Bon pour DOS
+\setlength{\marginparsep}{7pt} % SÃ©paration de la marge
+\setlength{\topmargin}{0pt} % Pas de marge en haut
+\setlength{\headheight}{13pt} % Haut de page
+\setlength{\headsep}{10pt} % Entre le haut de page et le texte
+\setlength{\footskip}{27pt} % Bas de page + sÃ©paration
+\setlength{\textheight}{708pt} % Hauteur de la zone de texte (25cm)
+
+\begin{document}
+
+% Page de couverture
+\title{Proposition de solution : proxy HTTP}
+\author{Louis BILLIET \\ Alexandre LOYWICK}
+\date{12 Nov. 2013}
+\maketitle
+
+\section{Mode de fonctionnement}
+Notre proxy est basé sur \href{http://www.decalage.info/python/cherryproxy}{Cherryproxy}, un proxy HTTP extensible \'ecrit en python2.
+Cherryproxy est bas\'e sur \href{http://docs.cherrypy.org/dev/refman/wsgiserver/init.html}{Cherrypy WSGI} et httplib et est diffus\'e sous licence BSD.
+Il est annonc\'e comme ne supportant pas le protocole HTTPS (ce qui n'est pas grave dans le cadre su TP).
+Ce qui est d\'erangeant par contre, c'est qu'il ne supporte pas toutes les fonctionnalit\'es de HTTP 1.1 : la m\'ethode POST, par exemple, est mal support\'e.
+Ce qui nous a cout\'e pas mal de d\'efaites lors du deathmatch car le proxy est jug\'e ``trop s\'ev\`ere''.\\
+\\
+Pour s'en servir, il suffit d'h\'eriter d'une classe (cherryproxy.CherryProxy) et de red\'efinir 3 m\'ethodes :
+\begin{itemize}
+\item \verb+filter_request_headers+, qui sera appel\'e lorsqu'on re\c coit une requ\^ete.
+\item \verb+filter_request+, qui sera appel\'e lorsque le corps de la requ\^ete est lue (s'il y en a une).
+\item \verb+filter_response+, qui sera appel\'e lorsqu'on r\'ecup\`ere la r\'eponse d'une requ\^ete non filtr\'ee.
+\end{itemize}
+
+\section{Les stratégies de détection mises en place}
+Ce chapitre traitera des diff\'erents message laiss\'es par notre proxy.
+
+\subsection{Ai-je bien lu 'SSH' ?}
+Lorsqu'on ouvre une connexion vers un serveur SSH avec telnet, on reçoit un prompt ressemblant \`a \verb+SSH-2.0-OpenSSH_6.4+.
+Si on filtre ``OpenSSH\_'' (qui a tr\`es peu de chances d'appara\^itre dans une requ\^ete l\'egitime), et ce dans tous les codages possibles (base 64, base 32, binascii, ...), le client SSH ne recevra pas la prompt et la communication ne pourra pas s'initialiser.
+
+\subsection{User-Agent vide ou incorrect !}
+Tout bon logiciel \'emanant des requ\^etes HTTP utilisent un user-agent.
+L'absence de ce header est possible mais extr\^emement rare.
+
+\subsection{Je suis un proxy web ! Tu m'entends ? WEB !}
+Un filtrage simple : si l'utilisateur consulte un service sur un port autre que 80 (HTTP) et 443 (HTTPS), la connexion est refus\'ee.
+
+\subsection{Tu sais quoi ? Ton serveur t'as repondu de la merde !}
+On regarde s'il y a correspondance entre le \verb+accept-encoding+ de la requ\^ete et le \verb+content-encoding+ de la r\'eponse.
+S'il n'y a pas correspondance, c'est soit une tentative d'attaque (!), soit un logiciel qui tente de faire des trucs pas nets.
+
+\section{Conclusion}
+Ne pas utiliser Cherryproxy. Ne pas attendre non plus une mise \`a jour car le projet \`a l'air abandonn\'e depuis Novembre 2011\ldots
+
+\end{document}
