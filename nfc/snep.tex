@@ -26,26 +26,98 @@
 \begin{document}
 
 % Page de couverture
-\title{Documentation : Simple NDEF Exchange Protocol}
+\title{Compte rendu des Atelier sur la RFID}
 \author{Louis BILLIET \\ Florent DAVID}
 \date{23 Oct. 2013}
 \maketitle
 
-\section{Introduction}
+\section{Prise en main}
+Q1 - L'identifiant de la carte :
+\verb+B4 91 45 AA 90 00+
+
+
+
+Q2- Les donn\'ees contenues dans les 4 premiers secteurs\\
+B4 91 45 AA CA 88 04 00 47 C1 1E 59 B9 00 50 05\\
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00\\
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00\\
+00 00 00 00 00 00 FF 07 80 69 FF FF FF FF FF FF\\
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00\\
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00\\
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00\\
+00 00 00 00 00 00 FF 07 80 69 FF FF FF FF FF FF\\
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00\\
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00\\
+00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00\\
+00 00 00 00 00 00 FF 07 80 69 FF FF FF FF FF FF
+
+
+
+Q3- Analyse des donn\'ees
+Le premier secteur contiens des donn\'ees. Surement un header par d\'efaut.
+Tous les 4 secteurs, nous avons les trailer blocks. Ils permettent de controller l'acces aux donn\'ees.
+
+
+
+Q7- Message NDEF pour le smart poster\\
+03 0F D1 01\\
+0B 55 05 30\\
+38 33 36 36\\
+35 36 35 36\\
+35 FE 00 00
+
+\section{Pairage bluetooth}
+Initialisation de l'ultralight C :\\
+E1 10 12 00\\
+01 03 A0 10\\
+44 03 3B D2\\
+20 18 61 70\\
+70 6C 69 63\\
+61 74 69 6F\\
+6E 2F 76 6E\\
+64 2E 62 6C\\
+75 65 74 6F\\
+6F 74 68 2E\\
+65 70 2E 6F\\
+6F 62 00 16\\
+C7 08 47 FD\\
+0D 00 0F 09\\
+4E 6F 6B 69\\
+61 20 50 6C\\
+61 79 20 33\\
+36 30 FE 00
+
+\section{Lecture de la carte PassPass de transpole}
+Commande de selection de l'application : 00 A4 04 00 08 33 4D 54 52 2E 49 43 41
+Commande de lecture d'un enregistrement : 00 B2 nn (SFI*8)+4 00
+identit\'e du porteur : 00 B2 01 3C 00
+Date de naissance : dans le fichier \verb+environnement+, a partir du 71\`eme bit cod\'e en BCD : \verb+aaaammjj+
+journal des \'ev\`enements : \\
+    00 B2 01 44 00\\
+\ldots 00 B2 03 44 00\\
+date de l'\'ev\`enement : 
+\begin{itemize}
+\item 14 premiers bits : nombre de jours depuis le 1er janvier 1997
+\item 11 bits suivants : nombre de minutes depuis minuit
+\item 69\`eme bit, 16 bits : code station
+\end{itemize}
+
+\section{Documentation : Simple NDEF Exchange Protocol}
+\subsection{Introduction}
 
 Le Simple NDEF Exchange Protocol (SNEP) permet \`a une application s'executant sur un appareil \'equip\'e pour le NFC
 d'\'echanger des messages NDEF (NFC Data Exchange Format) avec un autre appareil \'equip\'e lors d'une communication en mode pair \`a pair.
 Le protocole se base souvent sur le protocole Logical Link Control Protocol (LLCP) afin d'\'etablir une liaison fiable lors de l'\'echange de donn\'ees.\cite{NFC_forum}
 Sa sp\'ecification est g\'er\'ee par le NFC Forum.\cite{NDEF_spec}
 
-\section{Un protocole bas\'e sur l'\'echange de messages}
+\subsection{Un protocole bas\'e sur l'\'echange de messages}
 
 Le protocole consiste en un \'echange de requ\^ete / r\'eponse.
 \'Echanger de tels messages necessite un protocole de transport fiable capable de transmettre des messages d'au moins 6 octets.
 La communication entre plusieurs clients/serveurs n\'ecessite un protocole de transport supportant des connection simultan\'ees logiquement s\'epar\'es.
 Dans l'architecture d\'efinie par le NFC Forum, SNEP repose sur le protocole LLCP.
 
-\section{La forme des messages}
+\subsection{La forme des messages}
 
 La requ\^ete est compos\'ee de la version du protocole (1 octet), la m\'ethode de la requ\^ete (continue, get, put ou reject, soit 1 octet), la taille du message (4 octets) et les informations concernant la requ\^ete (taille maximum : 2\up{32}-1 octets).
 
@@ -58,7 +130,7 @@ La r\'eponse est compos\'ee de la version du protocole (1 octet), un code d'\'et
 Les messages SNEP peuvent \^etre fragment\'es pour pouvoir transporter des messages NDEF de taille sup\'erieure \`a 2\up{32}-1 octets.
 Le premier fragment devras alors comporter l'ent\^ete complète du message SNEP (soit la version du protocole, la m\'ethode o\`u le code d'\'etat et la taille du message).
 
-\section{La fragmentation des messages}
+\subsection{La fragmentation des messages}
 
 Lors de l'envoi d'un premier fragment de message, le destinataire doit indiquer \`a l'\'emetteur qu'il est capable de recevoir les fragments suivants. Dans ce cas, l'\'emetteur transmet le reste des fragments sans attendre d'acquittement.
 
@@ -68,7 +140,7 @@ M\^eme dans le cas o\`u le destinataire d'un message SNEP ne supporte pas la ver
 
 Si une requ\^ete est compl\`ete, le destinataire ne doit pas acquitter mais r\'epondre tout de suite \`a la requ\^ete.
 
-\section{Les m\'ethode de requ\^ete}
+\subsection{Les m\'ethode de requ\^ete}
 La m\'ethode appell\'ee est cod\'e sur 1 octet comme suit :\\
 \begin{tabular}{| l | l | l |}
 \hline
@@ -82,11 +154,11 @@ Code & Nom & Description \\
 80-F & & Reserv\'e pour les codes de r\'eponse. \\\hline
 \end{tabular}
 
-\subsection{Compl\'ement d'informations : GET}
+\subsubsection{Compl\'ement d'informations : GET}
 Le dernier champ d'une requ\^ete GET est d\'ecoup\'e en deux partie : la taille accept\'ee (cod\'e sur 4 octets) et le message NDEF, d\'esignant la ressource consult\'ee.
 
 
-\section{Les codes de r\'eponse}
+\subsection{Les codes de r\'eponse}
 Le code de r\'eponse est cond\'e sur 1 octet comme suit :\\
 \begin{tabular}{| l | l | l |}
 \hline
@@ -107,11 +179,11 @@ FF & Reject & N'envoyez pas les fragments suivants. \\
 \hline
 \end{tabular}
 
-\subsection{Compl\'ement d'information : Success}
+\subsubsection{Compl\'ement d'information : Success}
 Le dernier champ ne doit \^etre renseign\'e que si la m\'ethode \'etait un GET.
 
 
-\section{Bibliographie}
+\subsection{Bibliographie}
 % Bibliographie
 \bibliographystyle{unsrt}
 \bibliography{biblio}{}

@@ -32,10 +32,12 @@ def communicate_with_local(connection):
 		for s in read_me:
 			data = s.recv(512)
 			data = base64.b64encode(data)
+			data = base64.b64encode(data)
 			output_buffer.extend((data,))
                 for s in write_me:
 			try:
 				data = input_buffer.popleft()
+				data = base64.b64decode(data)
 				data = base64.b64decode(data)
 				s.sendall(data)
 			except IndexError:
